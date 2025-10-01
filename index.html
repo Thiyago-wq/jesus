@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Atlas das Religiões — Protótipo</title>
+  <meta name="description" content="Protótipo sofisticado para um site sobre história, regiões, populações e culturas religiosas." />
+  <style>
+    :root{
+      --bg:#0f1724;
+      --card:#0b1320;
+      --muted:#9aa6b2;
+      --accent:#7dd3fc;
+      --accent-2:#a78bfa;
+      --glass: rgba(255,255,255,0.04);
+      --radius:14px;
+      --glass-strong: rgba(255,255,255,0.06);
+      --max-width:1150px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#061226 0%,var(--bg) 100%);color:#e6eef6}
+    a{color:var(--accent)}
+
+    .wrap{max-width:var(--max-width);margin:36px auto;padding:28px}
+
+    header{display:flex;align-items:center;justify-content:space-between;gap:18px}
+    .brand{display:flex;align-items:center;gap:14px}
+    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:700;color:#042233}
+    .title{font-size:18px;font-weight:700;letter-spacing:0.3px}
+    .subtitle{font-size:12px;color:var(--muted);margin-top:-4px}
+
+    nav{display:flex;gap:12px}
+    .nav-link{padding:8px 12px;border-radius:10px;background:transparent;color:var(--muted);text-decoration:none;font-size:14px}
+    .nav-link:hover{background:var(--glass);color:#e8f8ff}
+
+    main{margin-top:28px}
+
+    /* Hero */
+    .hero{display:grid;grid-template-columns:1fr 460px;gap:24px;align-items:start}
+    .panel{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:20px;border-radius:var(--radius);backdrop-filter:blur(6px);box-shadow:0 6px 20px rgba(2,6,23,0.6)}
+    .hero-left h1{margin:0;font-size:34px}
+    .kicker{display:inline-block;margin-bottom:10px;padding:6px 10px;border-radius:999px;background:var(--glass);color:var(--accent);font-weight:600;font-size:12px}
+    .lead{color:var(--muted);margin-top:12px;line-height:1.5}
+
+    .cta-row{display:flex;gap:12px;margin-top:18px}
+    .btn{padding:10px 14px;border-radius:10px;background:var(--accent);color:#042233;font-weight:700;border:none;cursor:pointer}
+    .btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--accent-2)}
+
+    /* Mini cards */
+    .cards{display:flex;gap:12px;margin-top:18px}
+    .mini{flex:1;padding:12px;border-radius:12px;background:var(--glass-strong);}
+    .mini strong{display:block}
+    .mini p{color:var(--muted);margin:8px 0 0 0;font-size:13px}
+
+    /* Right column: interactive map + search */
+    .map-card{height:420px;display:flex;flex-direction:column}
+    .map{flex:1;border-radius:12px;overflow:hidden;background:linear-gradient(180deg,#071730,#0b2130);display:flex;align-items:center;justify-content:center}
+    .map svg{width:100%;height:100%;object-fit:cover}
+    .map-controls{display:flex;gap:8px;margin-top:10px;align-items:center}
+    .search{flex:1;display:flex}
+    .search input{flex:1;padding:10px;border-radius:10px;border:1px dashed rgba(255,255,255,0.03);background:transparent;color:inherit}
+
+    /* Sections */
+    section.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:26px}
+    .card{padding:18px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent)}
+    .card h3{margin:0 0 8px 0}
+    .muted{color:var(--muted);font-size:13px}
+
+    /* Timeline */
+    .timeline{padding:18px;border-radius:12px;background:linear-gradient(90deg, rgba(167,139,250,0.06), rgba(125,211,252,0.02));}
+    .events{display:flex;flex-direction:column;gap:12px;margin-top:10px}
+    .event{display:flex;gap:12px;align-items:flex-start}
+    .dot{width:12px;height:12px;border-radius:50%;background:var(--accent);margin-top:4px}
+
+    /* Charts simple */
+    .chart{height:210px;background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent);border-radius:10px;padding:10px}
+
+    footer{margin-top:36px;padding:18px;border-radius:12px;background:transparent;color:var(--muted);display:flex;justify-content:space-between}
+
+    /* Responsive */
+    @media (max-width:980px){
+      .hero{grid-template-columns:1fr}
+      section.grid{grid-template-columns:1fr}
+    }
+
+    /* Fancy micro interactions */
+    .region:hover{transform:translateY(-6px);transition:transform .22s}
+    .card, .mini, .panel{transition:transform .18s, box-shadow .18s}
+    .card:hover{transform:translateY(-6px)}
+
+    /* Tooltip */
+    .tooltip{position:fixed;pointer-events:none;padding:8px 10px;background:#061226;border-radius:8px;border:1px solid rgba(255,255,255,0.04);font-size:13px;color:var(--muted);z-index:999}
+
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo">AR</div>
+        <div>
+          <div class="title">Atlas das Religiões</div>
+          <div class="subtitle">História • Regiões • Populações • Culturas</div>
+        </div>
+      </div>
+      <nav>
+        <a class="nav-link" href="#home">Início</a>
+        <a class="nav-link" href="#historia">História</a>
+        <a class="nav-link" href="#regioes">Regiões</a>
+        <a class="nav-link" href="#populacoes">Populações</a>
+        <a class="nav-link" href="#culturas">Culturas</a>
+        <a class="nav-link" href="#contato">Contato</a>
+      </nav>
+    </header>
+
+    <main id="home">
+      <div class="hero">
+        <div class="hero-left panel">
+          <span class="kicker">Projeto Protótipo</span>
+          <h1>Uma visão sofisticada e interativa sobre religiões do mundo</h1>
+          <p class="lead">Navegue por linhas do tempo, explore mapas por região, visualize estatísticas de população e mergulhe nas culturas e rituais que moldaram sociedades.</p>
+          <div class="cta-row">
+            <button class="btn" id="open-timeline">Ver Linha do Tempo</button>
+            <button class="btn secondary" id="open-map">Explorar Mapa</button>
+          </div>
+
+          <div class="cards">
+            <div class="mini">
+              <strong>História</strong>
+              <p>Textos e períodos: da antiguidade à contemporaneidade, com fontes e referências.</p>
+            </div>
+            <div class="mini">
+              <strong>Regiões</strong>
+              <p>Mapas interativos por continente, país e comunidades locais.</p>
+            </div>
+            <div class="mini">
+              <strong>Populações</strong>
+              <p>Gráficos e tabelas com dados demográficos históricos e projeções.</p>
+            </div>
+          </div>
+
+        </div>
+
+        <aside class="panel map-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <strong>Mapa Interativo</strong>
+            <div class="muted">Última atualização: 2025-10-01</div>
+          </div>
+          <div class="map" id="map">
+            <!-- Simplified SVG world (stylized) - clicking regions will trigger events -->
+            <svg viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid meet" id="world-svg" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="g1" x1="0" x2="1">
+                  <stop offset="0" stop-color="#7dd3fc" stop-opacity="0.12"/>
+                  <stop offset="1" stop-color="#a78bfa" stop-opacity="0.08"/>
+                </linearGradient>
+              </defs>
+              <rect width="1200" height="600" fill="url(#g1)" />
+
+              <!-- Continents simplified shapes -->
+              <g id="continents" fill="#083045" stroke="#0b3b4f" stroke-width="0.8">
+                <path id="america" class="region" d="M120 120 C200 60, 280 100, 360 120 C400 130, 440 160, 460 220 C480 300, 420 360, 360 390 C300 420, 200 380, 150 340 C120 300,100 210,120 120z" />
+                <path id="africa" class="region" d="M540 260 C560 200,620 180,660 200 C700 220,740 260,732 320 C720 380,680 420,620 430 C560 440,520 340,540 260z" />
+                <path id="europe" class="region" d="M520 150 C540 120,590 110,620 120 C640 130,660 150,660 180 C660 210,610 220,580 200 C540 180,520 160,520 150z" />
+                <path id="asia" class="region" d="M700 110 C760 90,860 80,940 140 C1000 190,1060 260,1040 340 C1020 420,940 460,860 480 C780 500,720 440,700 360 C680 280,700 180,700 110z" />
+                <path id="oceania" class="region" d="M980 420 C1000 400,1050 420,1090 440 C1110 460,1130 490,1110 510 C1080 540,1000 520,980 480 C960 440,980 430,980 420z" />
+              </g>
+
+              <!-- subtle grid -->
+              <g stroke="rgba(255,255,255,0.03)" stroke-width="0.6">
+                <line x1="0" y1="300" x2="1200" y2="300" />
+                <line x1="600" y1="0" x2="600" y2="600" />
+              </g>
+            </svg>
+          </div>
+
+          <div class="map-controls">
+            <div class="search"><input id="searchInput" placeholder="Buscar: religião, país ou cultura" /></div>
+            <button class="btn secondary" id="btnLegend">Legenda</button>
+          </div>
+        </aside>
+      </div>
+
+      <section class="grid">
+        <article id="historia" class="card">
+          <h3>História</h3>
+          <p class="muted">Linhas do tempo interativas e arquivos de eventos importantes.</p>
+          <div class="timeline" id="timeline">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <strong>Linha do Tempo (Selecione um período)</strong>
+              <small class="muted">Período: 1000 a.C. — 2000 d.C.</small>
+            </div>
+            <div class="events" id="events">
+              <!-- events populated by JS -->
+            </div>
+          </div>
+        </article>
+
+        <article id="regioes" class="card">
+          <h3>Regiões</h3>
+          <p class="muted">Análises por continente, país e comunidades locais.</p>
+          <div style="display:flex;gap:10px;margin-top:12px">
+            <div style="flex:1">
+              <div class="card region" style="padding:12px">
+                <strong>África</strong>
+                <p class="muted">Ritmos, sincretismos e religiões tradicionais.</p>
+              </div>
+            </div>
+            <div style="flex:1">
+              <div class="card region" style="padding:12px">
+                <strong>Ásia</strong>
+                <p class="muted">Budismo, Hinduísmo, Taoísmo e novas expressões.</p>
+              </div>
+            </div>
+            <div style="flex:1">
+              <div class="card region" style="padding:12px">
+                <strong>Américas</strong>
+                <p class="muted">Cristianismo, tradições indígenas e sincretismo.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article id="populacoes" class="card">
+          <h3>Populações</h3>
+          <p class="muted">Dados demográficos e gráficos comparativos.</p>
+          <div class="chart" id="chart"></div>
+        </article>
+      </section>
+
+      <section style="margin-top:18px;display:grid;grid-template-columns:2fr 1fr;gap:18px">
+        <article id="culturas" class="card">
+          <h3>Culturas & Rituais</h3>
+          <p class="muted">Textos, imagens e áudios — coleções culturais por tradição.</p>
+          <div style="display:flex;gap:12px;margin-top:12px">
+            <div style="flex:1;padding:12px;background:var(--glass);border-radius:12px">
+              <strong>Rituais</strong>
+              <p class="muted">Descrição de cerimônias e significado simbólico.</p>
+            </div>
+            <div style="flex:1;padding:12px;background:var(--glass);border-radius:12px">
+              <strong>Arte & Arquitetura</strong>
+              <p class="muted">Templos, igrejas, mosques, e influências locais.</p>
+            </div>
+          </div>
+        </article>
+
+        <aside class="card">
+          <h3>Explorar</h3>
+          <p class="muted">Atalhos rápidos</p>
+          <ul style="padding-left:18px;color:var(--muted)">
+            <li><a href="#historia">Linha do Tempo</a></li>
+            <li><a href="#regioes">Mapa Interativo</a></li>
+            <li><a href="#populacoes">Estatísticas</a></li>
+            <li><a href="#culturas">Coleções</a></li>
+          </ul>
+        </aside>
+      </section>
+
+    </main>
+
+    <footer>
+      <div>© Atlas das Religiões — Protótipo</div>
+      <div class="muted">Feito para demonstração • Salve este arquivo como <code>index.html</code> e abra no navegador</div>
+    </footer>
+  </div>
+
+  <div id="tooltip" class="tooltip" style="display:none"></div>
+
+  <script>
+    // --- Simple interactive behaviors for the prototype ---
+    const regions = document.querySelectorAll('.region');
+    const tooltip = document.getElementById('tooltip');
+    const eventsContainer = document.getElementById('events');
+
+    // Sample timeline events (abridged)
+    const timeline = [
+      {year:-600, title:'Formação de tradições védicas', desc:'Textos e rituais védicos se consolidam no subcontinente indiano.'},
+      {year:-500, title:'Nascimento do Budismo', desc:'Siddhartha Gautama e o surgimento de ensinamentos budistas.'},
+      {year:30, title:'Cristianismo primitivo', desc:'Comunidades cristãs se expandem pelo Mediterrâneo.'},
+      {year:610, title:'Início do Islã', desc:'Profeta Maomé recebe as primeiras revelações.'},
+      {year:1500, title:'Colonialismo e sincretismo', desc:'Contato entre religiões e surgimento de práticas sincréticas.'},
+      {year:1900, title:'Movimentos modernos', desc:'Reformas, novos movimentos espirituais e secularização em áreas urbanas.'}
+    ];
+
+    function formatYear(y){
+      if(y<0) return Math.abs(y)+' a.C.';
+      return y+' d.C.';
+    }
+
+    // Populate timeline
+    timeline.forEach(ev => {
+      const el = document.createElement('div'); el.className='event';
+      el.innerHTML = `<div class="dot"></div><div><strong>${formatYear(ev.year)} — ${ev.title}</strong><div class="muted">${ev.desc}</div></div>`;
+      eventsContainer.appendChild(el);
+    });
+
+    // Map interactions
+    regions.forEach(r => {
+      r.addEventListener('mouseenter', e => {
+        showTooltip(e, r.id);
+      });
+      r.addEventListener('mousemove', e => { moveTooltip(e); });
+      r.addEventListener('mouseleave', e => {
+        hideTooltip();
+      });
+      r.addEventListener('click', e => {
+        openRegionDetail(r.id);
+      });
+    });
+
+    function showTooltip(e, id){
+      const names = {
+        america: 'Américas', africa:'África', europe:'Europa', asia:'Ásia', oceania:'Oceania'
+      };
+      tooltip.style.display='block';
+      tooltip.innerHTML = `<strong>${names[id] || id}</strong><div class="muted">Clique para ver mais</div>`;
+      moveTooltip(e);
+    }
+    function moveTooltip(e){
+      const pad=14;
+      tooltip.style.top = (e.clientY + pad) + 'px';
+      tooltip.style.left = (e.clientX + pad) + 'px';
+    }
+    function hideTooltip(){ tooltip.style.display='none'; }
+
+    function openRegionDetail(id){
+      // Example modal-lite: replace content of chart and highlight timeline
+      document.getElementById('chart').innerHTML = `<div style="padding:12px;"><strong>Dados — ${id.toUpperCase()}</strong><p class='muted'>Gráfico populacional (exemplo fictício) e resumo histórico para a região selecionada.</p><canvas id='c' width='500' height='180'></canvas></div>`;
+      drawSampleChart(id);
+      // scroll to populations
+      document.getElementById('populacoes').scrollIntoView({behavior:'smooth'});
+    }
+
+    // Simple sample chart drawing (no libs)
+    function drawSampleChart(id){
+      const canvas = document.getElementById('c');
+      if(!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      // mock data depending on region
+      const dataMap = {
+        america:[30,35,38,40,43,47], africa:[20,25,32,40,55,70], europe:[60,58,55,52,50,48], asia:[50,52,55,58,62,65], oceania:[5,6,7,8,9,9]
+      };
+      const d = dataMap[id] || [10,15,20,28,37,45];
+      const max = Math.max(...d);
+      const padding=30; const w=canvas.width; const h=canvas.height;
+      const stepX = (w-2*padding)/(d.length-1);
+      // grid
+      ctx.strokeStyle='rgba(255,255,255,0.06)'; ctx.lineWidth=1;
+      for(let i=0;i<5;i++){
+        const y = padding + (h-2*padding)*(i/4);
+        ctx.beginPath(); ctx.moveTo(padding,y); ctx.lineTo(w-padding,y); ctx.stroke();
+      }
+      // polyline
+      ctx.beginPath();
+      d.forEach((v,i)=>{
+        const x = padding + i*stepX;
+        const y = h - padding - ( (v/max) * (h-2*padding) );
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      });
+      ctx.strokeStyle='rgba(125,211,252,0.9)'; ctx.lineWidth=3; ctx.stroke();
+      // points
+      d.forEach((v,i)=>{
+        const x = padding + i*stepX;
+        const y = h - padding - ( (v/max) * (h-2*padding) );
+        ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2); ctx.fillStyle='white'; ctx.fill();
+      });
+      // labels
+      ctx.fillStyle='rgba(255,255,255,0.75)'; ctx.font='12px Inter, Arial';
+      ['1950','1970','1990','2010','2030','2050'].forEach((t,i)=>{
+        const x = padding + i*stepX; ctx.fillText(t,x-15,h-8);
+      });
+    }
+
+    // Pre-draw default chart
+    document.addEventListener('DOMContentLoaded', ()=>{
+      document.getElementById('chart').innerHTML = `<div style='padding:12px;'><strong>Panorama Global (exemplo)</strong><p class='muted'>Clique em uma região no mapa para ver dados fictícios.</p></div>`;
+    });
+
+    // Buttons
+    document.getElementById('open-timeline').addEventListener('click', ()=>{
+      document.getElementById('historia').scrollIntoView({behavior:'smooth'});
+    });
+    document.getElementById('open-map').addEventListener('click', ()=>{
+      document.getElementById('map').scrollIntoView({behavior:'smooth'});
+    });
+
+    // Simple search (matches world regions + keywords)
+    document.getElementById('searchInput').addEventListener('keydown', e=>{
+      if(e.key==='Enter') performSearch(e.target.value);
+    });
+    function performSearch(q){
+      if(!q) return alert('Digite algo para buscar.');
+      q=q.toLowerCase();
+      if(q.includes('budismo')||q.includes('asia')){ openRegionDetail('asia'); }
+      else if(q.includes('cristianismo')||q.includes('america')){ openRegionDetail('america'); }
+      else if(q.includes('islam')||q.includes('africa')){ openRegionDetail('africa'); }
+      else alert('Pesquisa demo — tente nomes como "Ásia", "Cristianismo" ou "África".');
+    }
+
+    // Small accessibility: keyboard focus for regions
+    document.querySelectorAll('#continents .region').forEach((reg,i)=>{ reg.setAttribute('tabindex',0) });
+
+    // Tooltip follow on scroll (hide if offscreen)
+    window.addEventListener('scroll', ()=>{ tooltip.style.display='none' });
+
+    // END
+  </script>
+</body>
+</html>
